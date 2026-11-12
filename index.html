@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>STST座席マップ 202611</title>
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<a class="skip" href="#main">本文へ移動</a>
+<main id="main" class="wrap">
+<div class="titlebar"><h1>STST座席マップ 202611</h1><div class="palsel"><button type="button" id="palBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="palMenu"><span class="pb1" aria-hidden="true">配色 ▾</span><span class="pb2" id="palName" aria-hidden="true">標準</span></button><ul id="palMenu" role="listbox" aria-label="配色を選ぶ" hidden></ul></div></div>
+<div id="live" class="sr-only" role="status" aria-live="polite"></div>
+
+<details class="panel srcbox" id="srcBox">
+  <summary id="srcTitle">データの保存について</summary>
+  <p class="srcstatus" id="srcStatus" role="status" aria-live="polite">準備中…</p>
+</details>
+
+
+
+
+
+<nav aria-label="表示するブロックの切り替え">
+<ul class="pagetabs" id="pageTabs">
+  <li><button type="button" data-page="all" aria-pressed="true">全体</button></li>
+  <li><button type="button" data-page="A" aria-pressed="false">A<span class="cnt"></span></button></li>
+  <li><button type="button" data-page="B" aria-pressed="false">B<span class="cnt"></span></button></li>
+  <li><button type="button" data-page="C" aria-pressed="false">C<span class="cnt"></span></button></li>
+  <li><button type="button" data-page="D" aria-pressed="false">D<span class="cnt"></span></button></li>
+</ul>
+</nav>
+
+<div class="mapshell" id="mapshell" tabindex="0" role="group" aria-label="座席の図。プラスとマイナスのキーで拡大縮小、矢印キーで移動、ゼロで元に戻します。座席の内容は下の表でも確認できます。">
+  <svg id="seatmap" viewBox="0 0 1000 680" preserveAspectRatio="xMidYMid meet" role="presentation"></svg>
+  <div class="pageinfo" id="pageInfo" aria-hidden="true">全体</div>
+  <div class="ctl pg">
+    <button type="button" id="prevBtn" aria-label="前のブロックを表示">‹ 前</button>
+    <button type="button" id="nextBtn" aria-label="次のブロックを表示">次 ›</button>
+  </div>
+  <div class="ctl zoom">
+    <button type="button" id="zin" aria-label="拡大">＋</button>
+    <button type="button" id="zout" aria-label="縮小">－</button>
+    <button type="button" id="zreset" aria-label="拡大を元に戻す">戻す</button>
+  </div>
+</div>
+
+
+
+
+
+
+<div id="swipeArea">
+<div class="monthbar" id="monthBar" role="group" aria-label="年月で絞り込み（すべてのタブと座席マップに反映）"></div>
+<div class="navtabs" role="group" aria-label="一覧の切り替え">
+  <button type="button" data-sec="secDup" aria-pressed="true">重複している席</button>
+  <button type="button" data-sec="secTickets" aria-pressed="false">チケット一覧</button>
+  <button type="button" data-sec="secUnmapped" aria-pressed="false">図に出していない席</button>
+  <button type="button" data-sec="secCal" aria-pressed="false">カレンダー</button>
+</div>
+
+
+<section class="panel sec show" id="secDup" aria-labelledby="dupTitle">
+  <h2 id="dupTitle">重複している席（多い順）</h2>
+  <div id="dupList">なし</div>
+</section>
+
+<section class="panel sec" id="secTickets" aria-labelledby="tkTitle">
+  <h2 id="tkTitle">チケット一覧</h2>
+  
+  <div class="tablewrap"><table id="ticketTable"><caption>マップに反映された席。席名を押すと該当ブロックに移動します。</caption>
+    <thead><tr><th scope="col">公演日</th><th scope="col">時間</th><th scope="col">チーム</th><th scope="col">席</th><th scope="col">のみもの</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section class="panel sec" id="secCal" aria-labelledby="calTitle">
+  <h2 id="calTitle">公演カレンダー</h2>
+  <div class="layers" id="calLayers" role="group" aria-label="カレンダーに表示する項目の切り替え"></div>
+  <div class="calnav">
+    <button type="button" id="calPrev" aria-label="前の月">‹ 前</button>
+    <strong id="calMonth" aria-live="polite"></strong>
+    <button type="button" id="calNext" aria-label="次の月">次 ›</button>
+  </div>
+  <div id="calGrid" role="group" aria-label="日付ごとの公演情報とチケット枚数"></div>
+  <div class="caldetail" id="calDetail" aria-live="polite"></div>
+  <p class="calnote">公演カレンダーは公式サイトから11月上旬に取りこんだものです。</p>
+</section>
+
+<section class="panel sec" id="secUnmapped" aria-labelledby="unTitle">
+  <h2 id="unTitle">図に出していない席（BOX・座席未確認など）</h2>
+  <div class="tablewrap"><table id="unmappedTable"><caption>2F・BOX席など、図に表示しない席</caption>
+    <thead><tr><th scope="col">公演日</th><th scope="col">時間</th><th scope="col">チーム</th><th scope="col">席（原文）</th><th scope="col">のみもの</th><th scope="col">種類</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+</div>
+
+<section class="panel" aria-labelledby="inTitle">
+  <h2 id="inTitle">チケット入力</h2>
+  <label for="ticketInput" id="inLabel">タブ区切り：日付・時間・席・のみもの・席種類・チーム（任意）</label>
+  <textarea id="ticketInput" spellcheck="false" placeholder="1970-01-01&#9;00:00&#9;1F Aブロック1列1番&#9;煎茶（ホット）&#9;Premium&#9;Gold&#10;&#10;■公演名／会場／公演日時&#10;【1月公演／第0期】美少女戦士セーラームーン -Shining Theater Shinagawa Tokyo-&#10;品川プリンスホテル クラブeX&#10;1970年1月1日(木) 00:00&#10;■席種・券種・料金・座席番号&#10;●Premium seat 【ほうじ茶（ホット）】スーパーセーラームーン 0円&#10;1F Aブロック 1列 1番&#10;●Premium seat 【ホットゆず茶】スーパーセーラーちびムーン 0円&#10;1F Aブロック 1列 1番&#10;--------------------------------"></textarea>
+  <p class="hint" id="inMail">予約メールの本文（「■公演名…」「●席種…」の形式）も、そのまま貼り付けられます。</p>
+  <div class="row">
+    <button type="button" class="btn" id="applyBtn">反映する</button>
+    <button type="button" class="btn sub" id="clearBtn">空にする</button>
+  </div>
+  <p class="hint" id="inHint"></p>
+  <p class="stats" id="statsLine"></p>
+  <div class="warnbox" id="warnBox" hidden></div>
+</section>
+
+<section class="legend" aria-labelledby="lgTitle">
+  <h2 id="lgTitle">凡例</h2>
+  <h3>席種</h3>
+  <ul id="legendSeat"></ul>
+  <h3>所持枚数</h3>
+  <ul id="legendOwn"></ul>
+  <h3>公演チーム</h3>
+  <ul>
+    <li><span class="chip"><img src="assets/team-gold.svg" alt=""></span>Team Gold Moon</li>
+    <li><span class="chip"><img src="assets/team-silver.svg" alt=""></span>Team Silver Moon</li>
+    </ul>
+</section>
+
+<div class="secret"><button type="button" class="btn sub" id="secretBtn" aria-pressed="false">隠しボタン、合ってるかはわからないです</button></div>
+<details class="panel srcbox footnote" id="noticeBox">
+  <summary>ご利用上の注意・不具合報告</summary>
+  <div class="notice" id="noticeBody">
+    <h3>ご利用前にお読みください</h3>
+    <p>このページは、個人が作った非公式のファンツールです。「美少女戦士セーラームーン」の公式サイト、出演者、制作会社、会場とは関係がありません。</p>
+    <p>作品名・キャラクター名・チーム名などの権利は、各権利者に帰属します。</p>
+    <p>日程や出演者情報は、公式情報を参考にした目安です。正確性は保証しません。必ず公式の案内をご確認ください。</p>
+    <p>貼り付けたチケット情報は、お使いの端末のブラウザ内にだけ保存され、外部には送信されません。</p>
+    <p>不具合等報告：<a href="https://forms.gle/d2PjyN1iXHoNXGRp6" target="_blank" rel="noopener noreferrer">報告フォーム</a></p>
+    <p>製作者：402</p>
+  </div>
+</details>
+</main>
+
+<div id="seatModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="card">
+  <div class="mhead"><h2 id="modalTitle"></h2><button type="button" class="btn close" id="modalClose">閉じる</button></div>
+  <div class="tablewrap"><table id="modalTable"><thead><tr><th scope="col">公演日</th><th scope="col">時間</th><th scope="col">チーム</th><th scope="col">のみもの</th></tr></thead><tbody></tbody></table></div>
+</div></div>
+
+<dialog id="disclaimer" aria-labelledby="dcTitle">
+  <h2 id="dcTitle">ご利用前にお読みください</h2>
+  <div id="dcBody"></div>
+  <button type="button" class="btn" id="dcOk" autofocus>同意して使う</button>
+</dialog>
+
+<script src="js/config.js" defer></script>
+<script src="js/seatmap.js" defer></script>
+<script src="js/parser.js" defer></script>
+<script src="js/data.js" defer></script>
+<script src="js/schedule.js" defer></script>
+<script src="js/calendar.js" defer></script>
+<script src="js/render.js" defer></script>
+<script src="js/main.js" defer></script>
+</body>
+</html>

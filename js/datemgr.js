@@ -160,7 +160,6 @@ document.querySelectorAll('.modetabs button').forEach(b=>{
   };
 });
 
-// ----- プルダウン入力 -----
 function opt(sel,value,text){const o=document.createElement('option');o.value=value;o.textContent=text;sel.appendChild(o);}
 function fillNumSel(id,max){
   const s=dmById(id);s.innerHTML='';

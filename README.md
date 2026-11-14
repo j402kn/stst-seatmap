@@ -23,7 +23,7 @@
 | `js/main.js` | 初期化、タブ切り替え、初回の免責ダイアログ |
 | `assets/` | チームアイコン（SVG） |
 
-`js/` のファイルは通常の `<script defer>` で、この順に読み込みます（順序を変えると動きません）。
+`js/` のファイルは通常の `<script defer>` で、config → seatmap → parser → data → schedule → calendar → render → datemgr → main の順に読み込みます（順序を変えると動きません）。
 
 ## CSP
 

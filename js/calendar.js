@@ -3,7 +3,7 @@ let calY=2026, calM=11, calSel=null, calAuto=true;
 const LAYERS=[
   {id:'team',name:'公演チーム',text:'チーム',mk:''},
   {id:'photo',name:'写真撮影',text:'',mk:`<span class="emj">${EMO_PH}</span>`},
-  {id:'send',name:'お見送り',text:'',mk:`<span class="emj">${EMO_SD}</span>`},
+  {id:'send',name:'お見送り',text:'',mk:`<span class="emj wave">${EMO_SD}</span>`},
   {id:'bw',name:'BIRTHDAY WEEK',text:'Bday week',mk:''},
   {id:'cbd',name:'キャラクターの誕生日',text:'誕生日',mk:''},
   {id:'kbd',name:'キャストの誕生日',text:'',mk:'<span class="mk kb">★</span>'},

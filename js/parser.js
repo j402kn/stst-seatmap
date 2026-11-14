@@ -56,15 +56,72 @@ function tsvToRecords(text){
   });
   return out;
 }
+const KIND_RE=/^(Premium\s*seat|Class\s*[A-Z]|BOX\s*Room)/i;
+function csvRows(text){
+  const rows=[];let row=[],cell='',q=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(q){if(ch==='"'){if(text[i+1]==='"'){cell+='"';i++;}else q=false;}else cell+=ch;}
+    else if(ch==='"')q=true;
+    else if(ch===','){row.push(cell);cell='';}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);rows.push(row);row=[];cell='';}
+    else cell+=ch;
+  }
+  if(cell!==''||row.length){row.push(cell);rows.push(row);}
+  return rows.filter(r=>r.some(c=>String(c).trim()!==''));
+}
+const HEAD_KEYS={date:'date','日付':'date','公演日':'date',time:'time','時間':'time','時刻':'time',seat:'seat','席':'seat','座席':'seat',drink:'drink','のみもの':'drink','ドリンク':'drink',kind:'kind','席種':'kind','種類':'kind',team:'team','チーム':'team'};
+function csvToRecords(text){
+  const rows=csvRows(text);
+  if(!rows.length)return [];
+  const first=rows[0].map(c=>String(c).trim());
+  const isHead=!parseDateAny(first[0])&&first.some(c=>HEAD_KEYS[c.toLowerCase()]||HEAD_KEYS[c]);
+  const cols=isHead?first.map(c=>HEAD_KEYS[c.toLowerCase()]||HEAD_KEYS[c]||null):['date','time','seat','drink','kind','team','kashikiri'];
+  return rows.slice(isHead?1:0).map((r,i)=>{
+    const o={__line:i+1+(isHead?1:0)};
+    r.forEach((v,k)=>{if(cols[k])o[cols[k]]=v;});
+    return o;
+  });
+}
+function freeToRecords(text){
+  const out=[];let date=null,time=null;
+  text.normalize('NFKC').split(/\r?\n/).forEach((raw,i)=>{
+    const ln=raw.trim();if(!ln)return;
+    const sm=ln.match(/(\d+F\s*.*番)\s*$/);
+    if(sm&&KIND_RE.test(ln)){
+      const head=ln.slice(0,sm.index).trim();
+      const km=head.match(KIND_RE);
+      let rest=head.slice(km[0].length).replace(/\s*[\d,]+円\s*$/,'').trim();
+      let drink='',role='';
+      const dm=rest.match(/【([^】]*)】/);
+      if(dm){drink=dm[1].trim();role=rest.replace(dm[0],'').trim();}
+      else if(/ドリンクなし/.test(rest)){drink='なし';role=rest.replace(/ドリンクなし/,'').trim();}
+      else role=rest;
+      out.push({date,time,kind:km[0].replace(/\s+/g,' ').trim(),drink,role,seat:sm[1].replace(/\s+/g,' ').trim(),team:'',kashikiri:'',__line:i+1});
+      return;
+    }
+    if(!/番/.test(ln)&&parseDateAny(ln)){
+      date=ln.match(/\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2}|\d{4}年\d{1,2}月\d{1,2}日|\d{1,2}月\d{1,2}日/)[0];
+      const tm=ln.match(/(\d{1,2}):(\d{2})/);if(tm)time=tm[0];
+    }
+  });
+  return out;
+}
 function textToRecords(text){
   const t=text.trim();
+  if(!t)return [];
   if(/[■●]/.test(t)&&/\d{4}年\s*\d{1,2}月\s*\d{1,2}日/.test(t.normalize('NFKC')))return emailToRecords(text);
   if(/^[\[{]/.test(t)){
     try{const j=JSON.parse(t);const arr=Array.isArray(j)?j:(j.tickets||[]);return arr.map((r,i)=>Object.assign({__line:i+1},r));}
-    catch(e){return tsvToRecords(text);}
+    catch(e){}
   }
+  const n=t.normalize('NFKC');
+  if(!/\t/.test(t)&&n.split(/\r?\n/).some(l=>KIND_RE.test(l.trim())&&/番\s*$/.test(l.trim())))return freeToRecords(text);
+  if(/\t/.test(t))return tsvToRecords(text);
+  if(/,/.test(t))return csvToRecords(text);
   return tsvToRecords(text);
 }
+
 function emailToRecords(text){
   const lines=text.normalize('NFKC').split(/\r?\n/);
   const out=[]; let date=null,time=null,cur=null;

@@ -5,7 +5,7 @@ function paintSeat(o,n){
   o.label.setAttribute('font-size',(pal.big?o.fs*1.15:o.fs).toFixed(1));
   let halo=null, fr={c:fc,w:w};
   if(n>0)halo={c:'#000000',w:w+2.6};
-  if(o.added&&n===0)fr={c:'#ffffff',w:2,d:'3,2'};
+  if(o.added&&n===0)fr={c:fc,w:2,d:'3,2'};
   if(halo){o.halo.setAttribute('display','block');o.halo.setAttribute('stroke',halo.c);o.halo.setAttribute('stroke-width',halo.w);}
   else o.halo.setAttribute('display','none');
   o.fr.setAttribute('stroke',fr.c);o.fr.setAttribute('stroke-width',fr.w);

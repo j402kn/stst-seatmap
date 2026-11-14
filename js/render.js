@@ -56,14 +56,15 @@ function renderDup(map){
 }
 function renderMonthBar(){
   const all=[...tickets,...unmapped];
-  const yms=[...new Set(all.map(t=>t.date.ym))].sort((a,b)=>a-b);
+  const FIXED_YM=[202611,202612,202701,202702,202703];
+  const yms=[...new Set(all.map(t=>t.date.ym).concat(FIXED_YM))].sort((a,b)=>a-b);
   const multiYear=new Set(yms.map(x=>Math.floor(x/100))).size>1;
   if(currentMonth!=='all'&&!yms.includes(+currentMonth))currentMonth='all';
   const bar=document.getElementById('monthBar');bar.innerHTML='';
   const mk=(val,l)=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.setAttribute('aria-pressed',String(String(currentMonth)===String(val)));
     b.onclick=()=>{currentMonth=val;if(val!=='all'){calY=Math.floor(val/100);calM=val%100;calSel=null;}render();say(l+'で絞り込みました');};bar.appendChild(b);};
   mk('all','すべて');
-  yms.forEach(x=>mk(x,(multiYear?Math.floor(x/100)+'年':'')+(x%100)+'月'));
+  yms.forEach(x=>mk(x,(FIXED_YM.includes(x)?'':Math.floor(x/100)+'年')+(x%100)+'月'));
 }
 function tagFor(t){return t.seat.row==='PS'?'<span class="tag PS">ソファ</span>':(/Premium/i.test(t.kind)?'<span class="tag P">Premium</span>':'<span class="tag S">Class S</span>');}
 function renderTables(){

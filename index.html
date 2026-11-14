@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="dark">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<title>STST座席マップ 202611</title>
+<title>stst座席マップver0.261114</title>
 <link rel="stylesheet" href="css/style.css">
 
 </head>
@@ -16,9 +16,11 @@
 
 <a class="skip" href="#main">本文へ移動</a>
 <main id="main" class="wrap">
-<div class="titlebar"><h1>STST座席マップ 202611</h1><div class="palsel"><button type="button" id="palBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="palMenu"><span class="pb1" aria-hidden="true">配色 ▾</span><span class="pb2" id="palName" aria-hidden="true">標準</span></button><ul id="palMenu" role="listbox" aria-label="配色を選ぶ" hidden></ul></div></div>
+<div class="titlebar"><h1>stst座席マップver0.261114</h1><div class="palsel"><button type="button" id="palBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="palMenu"><span class="pb1" aria-hidden="true">配色 ▾</span><span class="pb2" id="palName" aria-hidden="true">標準</span></button><ul id="palMenu" role="listbox" aria-label="配色を選ぶ" hidden></ul></div></div>
 <div id="live" class="sr-only" role="status" aria-live="polite"></div>
 
+<div class="maintabs" role="group" aria-label="画面の切り替え"><button type="button" data-view="viewMap" aria-pressed="true">座席マップ</button><button type="button" data-view="viewDate" aria-pressed="false">日付管理</button></div>
+<div id="viewMap">
 <details class="panel srcbox" id="srcBox">
   <summary id="srcTitle">データの保存について</summary>
   <p class="srcstatus" id="srcStatus" role="status" aria-live="polite">準備中…</p>
@@ -100,20 +102,6 @@
 
 </div>
 
-<section class="panel" aria-labelledby="inTitle">
-  <h2 id="inTitle">チケット入力</h2>
-  <label for="ticketInput" id="inLabel">タブ区切り：日付・時間・席・のみもの・席種類・チーム（任意）</label>
-  <textarea id="ticketInput" spellcheck="false" placeholder="1970-01-01&#9;00:00&#9;1F Aブロック1列1番&#9;煎茶（ホット）&#9;Premium&#9;Gold&#10;&#10;■公演名／会場／公演日時&#10;【1月公演／第0期】美少女戦士セーラームーン -Shining Theater Shinagawa Tokyo-&#10;品川プリンスホテル クラブeX&#10;1970年1月1日(木) 00:00&#10;■席種・券種・料金・座席番号&#10;●Premium seat 【ほうじ茶（ホット）】スーパーセーラームーン 0円&#10;1F Aブロック 1列 1番&#10;●Premium seat 【ホットゆず茶】スーパーセーラーちびムーン 0円&#10;1F Aブロック 1列 1番&#10;--------------------------------"></textarea>
-  <p class="hint" id="inMail">予約メールの本文（「■公演名…」「●席種…」の形式）も、そのまま貼り付けられます。</p>
-  <div class="row">
-    <button type="button" class="btn" id="applyBtn">反映する</button>
-    <button type="button" class="btn sub" id="clearBtn">空にする</button>
-  </div>
-  <p class="hint" id="inHint"></p>
-  <p class="stats" id="statsLine"></p>
-  <div class="warnbox" id="warnBox" hidden></div>
-</section>
-
 <section class="legend" aria-labelledby="lgTitle">
   <h2 id="lgTitle">凡例</h2>
   <h3>席種</h3>
@@ -127,6 +115,124 @@
     </ul>
 </section>
 
+</div>
+<div id="viewDate" hidden>
+<section class="panel" aria-labelledby="dmTitle">
+  <h2 id="dmTitle">日付管理（チケット入力）</h2>
+  <div class="modetabs" role="group" aria-label="入力方法の切り替え">
+    <button type="button" data-mode="paste" aria-pressed="true">貼り付けで入力</button>
+    <button type="button" data-mode="form" aria-pressed="false">プルダウンで入力</button>
+  </div>
+
+  <div id="modePaste">
+    <label for="ticketInput" id="inLabel">貼り付け：予約メール本文（基本）／JSON／タブ区切り／CSV</label>
+    <textarea id="ticketInput" spellcheck="false" placeholder="■公演名／会場／公演日時&#10;【1月公演／第0期】美少女戦士セーラームーン&#10;1970年1月1日(木) 00:00&#10;■席種・券種・料金・座席番号&#10;●Premium seat 【ほうじ茶（ホット）】スーパーセーラームーン 0円&#10;1F Aブロック 1列 1番&#10;●Class A 0円&#10;2F BOX13 3番&#10;--------------------------------"></textarea>
+    <p class="hint" id="inMail">予約メール本文は、そのまま貼り付けられます。</p>
+    <div class="row">
+      <button type="button" class="btn" id="applyBtn">追加する（表の上に入ります）</button>
+      <button type="button" class="btn sub" id="clearBtn">入力欄を空にする</button>
+    </div>
+    <details class="fmtbox" id="fmtBox">
+      <summary>受け付ける書式の凡例</summary>
+      <h3>1. 予約メール本文（基本）</h3>
+      <pre>■公演名／会場／公演日時
+1970年1月1日(木) 00:00
+■席種・券種・料金・座席番号
+●Premium seat 【レモネード】スーパーセーラームーン 0円
+1F Dブロック 3列 5番
+●Class A 0円
+2F BOX13 3番
+●BOX Room ドリンクなし 0円
+2F BOX Room9 1番</pre>
+      <h3>2. 席の1行書式（日付行のあとに並べる）</h3>
+      <pre>1970-01-01 00:00
+Class A     2F BOX13 3番
+Premium seat  【レモネード】スーパーセーラームーン  1F Dブロック 3列 5番
+BOX Room  ドリンクなし  2F BOX Room9 1番</pre>
+      <h3>3. JSON</h3>
+      <pre>[{"date":"1970-01-01","time":"00:00","seat":"1F Aブロック1列1番","drink":"煎茶（ホット）","kind":"Premium seat","team":"Gold"}]</pre>
+      <h3>4. タブ区切り（列：日付・時間・席・のみもの・席種・チーム）</h3>
+      <pre>1970-01-01[Tab]00:00[Tab]1F Aブロック1列1番[Tab]煎茶（ホット）[Tab]Premium seat[Tab]Gold</pre>
+      <h3>5. CSV（1行目の見出しは省略可）</h3>
+      <pre>date,time,seat,drink,kind,team
+1970-01-01,00:00,1F Aブロック1列1番,煎茶（ホット）,Premium seat,Gold</pre>
+      <p class="hint">日付は 2026-12-05、2026/12/5、2026年12月5日、12月5日（土）の形で入力できます。席種は Premium seat／Class S／Class A／BOX Room／PS（ソファ）を使います。チームは Gold／Silver（空欄なら日程から補完）です。</p>
+    </details>
+  </div>
+
+  <div id="modeForm" hidden>
+    <fieldset class="dategrp"><legend>日付（yy/mm/dd）</legend>
+      <select id="fY" aria-label="年（yy）"></select><span aria-hidden="true">/</span>
+      <select id="fM" aria-label="月（mm）"></select><span aria-hidden="true">/</span>
+      <select id="fD" aria-label="日（dd）"></select>
+      <span class="wdlab" id="fWd"></span>
+    </fieldset>
+    <div class="fgrid">
+      <div><label for="fTime">時間</label><select id="fTime"></select></div>
+      <div><label for="fKind">席種</label>
+        <select id="fKind">
+          <option value="Premium seat">Premium seat</option>
+          <option value="Class S">Class S</option>
+          <option value="PS">PS（ソファ）</option>
+          <option value="Class A">Class A（2F BOX）</option>
+          <option value="BOX Room">BOX Room（2F）</option>
+        </select></div>
+      <div id="gfBlock"><label for="fBlock">ブロック</label>
+        <select id="fBlock"><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
+      <div id="gfRow"><label for="fRow">列</label><select id="fRow"></select><input type="number" id="fRowM" min="1" max="99" placeholder="手入力" hidden></div><div id="gfNum"><label for="fNum">番</label><select id="fNum"></select><input type="number" id="fNumM" min="1" max="99" placeholder="手入力" hidden></div><div id="gfBox"><label for="fBox">BOX（BOX Roomは部屋番号）</label><select id="fBox"></select><input type="number" id="fBoxM" min="1" max="99" placeholder="手入力" hidden></div>
+      <div><label for="fDrink">のみもの</label><select id="fDrink"></select><input type="text" id="fDrinkM" placeholder="手入力" hidden></div>
+      <div><label for="fTeam">チーム</label>
+        <select id="fTeam"><option value="">日程から自動</option><option value="Gold">Team Gold Moon</option><option value="Silver">Team Silver Moon</option></select></div>
+    </div>
+    <p class="hint" id="formNote"></p>
+    <div class="row"><button type="button" class="btn" id="formAddBtn">追加する</button></div>
+  </div>
+  <p class="hint" id="inHint"></p>
+  <p class="stats" id="statsLine"></p>
+  <div class="warnbox" id="warnBox" hidden></div>
+</section>
+
+<section class="panel" aria-labelledby="ioTitle">
+  <h2 id="ioTitle">ファイルの読み込みと書き出し</h2>
+  <label for="fileIn">ファイルを読み込む（.txt .csv .tsv .json .eml .html）</label>
+  <input type="file" id="fileIn" accept=".txt,.csv,.tsv,.json,.eml,.html,.htm,text/*,application/json">
+  <div class="row exrow" role="group" aria-label="並べ替え後の内容を書き出す">
+    <button type="button" class="btn sub" data-ex="csv">CSVで出力</button>
+    <button type="button" class="btn sub" data-ex="txt">TXTで出力</button>
+    <button type="button" class="btn sub" data-ex="json">JSONで出力</button>
+    <button type="button" class="btn sub" data-ex="html">HTMLで出力</button>
+  </div>
+  <div class="row"><button type="button" class="btn sub" id="allDelBtn">すべて削除</button></div>
+</section>
+
+<section class="panel" aria-labelledby="dtTitle">
+  <h2 id="dtTitle">入力済みのチケット</h2>
+  <p class="hint">見出しを押すと並べ替えます。あとから押した列が優先され、前の並べ替えは次点として残ります。同じ列をもう一度押すと昇順・降順が切り替わります。</p>
+  <p class="hint" id="sortInfo"></p>
+  <div class="tablewrap"><table id="dmTable"><caption>入力したチケット（新しく追加した行が上に入ります）</caption>
+    <thead><tr>
+      <th scope="col" aria-sort="none"><button type="button" class="sortbtn" data-col="date">日付</button></th>
+      <th scope="col">時間</th>
+      <th scope="col" aria-sort="none"><button type="button" class="sortbtn" data-col="block">ブロック</button></th>
+      <th scope="col" aria-sort="none"><button type="button" class="sortbtn" data-col="kind">席種</button></th>
+      <th scope="col">席</th>
+      <th scope="col" aria-sort="none"><button type="button" class="sortbtn" data-col="drink">のみもの</button></th>
+      <th scope="col">チーム</th>
+      <th scope="col">削除</th>
+    </tr></thead><tbody></tbody></table></div>
+</section>
+</div>
+
+<dialog id="importDlg" aria-labelledby="impTitle">
+  <h2 id="impTitle">読み込み方法</h2>
+  <p id="impMsg"></p>
+  <div class="row">
+    <button type="button" class="btn" id="impAdd">追加（表の上に入れる）</button>
+    <button type="button" class="btn sub" id="impRep">置き換え</button>
+    <button type="button" class="btn sub" id="impCancel">キャンセル</button>
+  </div>
+</dialog>
+
 <div class="secret"><button type="button" class="btn sub" id="secretBtn" aria-pressed="false">隠しボタン、合ってるかはわからないです</button></div>
 <details class="panel srcbox footnote" id="noticeBox">
   <summary>ご利用上の注意・不具合報告</summary>
@@ -137,7 +243,7 @@
     <p>日程や出演者情報は、公式情報を参考にした目安です。正確性は保証しません。必ず公式の案内をご確認ください。</p>
     <p>貼り付けたチケット情報は、お使いの端末のブラウザ内にだけ保存され、外部には送信されません。</p>
     <p>不具合等報告：<a href="https://forms.gle/d2PjyN1iXHoNXGRp6" target="_blank" rel="noopener noreferrer">報告フォーム</a></p>
-    <p>製作者：402</p>
+    <p>製作者：j402kn</p>
   </div>
 </details>
 </main>
@@ -160,6 +266,7 @@
 <script src="js/schedule.js" defer></script>
 <script src="js/calendar.js" defer></script>
 <script src="js/render.js" defer></script>
+<script src="js/datemgr.js" defer></script>
 <script src="js/main.js" defer></script>
 </body>
 </html>

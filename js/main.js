@@ -1,15 +1,5 @@
 const $=id=>document.getElementById(id);
-const ta=$('ticketInput'), srcStatus=$('srcStatus');
-const LSKEY='stst202611_tickets_v1';
-function applyText(){
-  const text=ta.value;
-  try{if(text.trim())localStorage.setItem(LSKEY,text);else localStorage.removeItem(LSKEY);}catch(e){}
-  loadRecords(textToRecords(text));
-  srcStatus.textContent='この端末に保存したデータを表示中です。';
-}
-ta.addEventListener('input',applyText);
-$('applyBtn').onclick=()=>{applyText();say('反映しました。'+$('statsLine').textContent);};
-$('clearBtn').onclick=()=>{ta.value='';lastHL=null;applyText();say('入力を空にしました');};
+const srcStatus=$('srcStatus');
 
 document.querySelectorAll('.navtabs button').forEach(b=>{
   b.onclick=()=>{document.querySelectorAll('.navtabs button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
@@ -83,11 +73,8 @@ document.querySelectorAll('.navtabs button').forEach(b=>{
 })();
 measureBoxes();setPage('all',true);
 
-$('inHint').textContent='貼り付けると自動でマップに反映されます。内容はこの端末（localStorage）にだけ保存され、外部には送信されません。日付は 2026-12-05 または 12月5日（土）の形で入力します。タブ区切りまたはJSONを受け付けます。';
 srcStatus.textContent='この端末に保存したデータを使います。';
-let saved=null;
-try{saved=localStorage.getItem(LSKEY);}catch(e){}
-if(saved){ta.value=saved;loadRecords(textToRecords(saved));}else render();
+dmInit();
 
 const DCKEY='stst202611_disclaimer_v1';
 (function(){
